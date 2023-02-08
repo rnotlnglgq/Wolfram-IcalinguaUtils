@@ -2,7 +2,7 @@
 
 Paclet[
 	Name -> "IcalinguaUtils",
-	Version -> "0.0.1",
+	Version -> "0.0.2", (* Change entries to functions; Save latest query result; Better DateSetter; More query fields; Some texts. *)
 	WolframVersion -> "12+", (* Relational databases are supported in 12.0, so this is **one minimal** requirement. Most newer versions are not tested. *)
 	Description -> "Provide tools for cooperating with Icalingua++, especially on message management.",
 	Root -> ".",
@@ -13,7 +13,7 @@ Paclet[
 			Root -> ".",
 			Context -> "IcalinguaUtils`",
 			Symbols -> {
-				IcalinguaUtils`$MessageSearchApp,
+				IcalinguaUtils`MessageSearchApp,
 				IcalinguaUtils`MessageSearch`RegisterRDBEntity,
 				IcalinguaUtils`MessageSearch`QueryMessages,
 				IcalinguaUtils`MessageSearch`QueryByFormAsync,

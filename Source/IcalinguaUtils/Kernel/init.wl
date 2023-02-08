@@ -6,5 +6,7 @@
 SetDirectory@DirectoryName@$InputFileName
 
 << IcalinguaUtils.wl
+Developer`DateSetter;
+<< DateSetterPatch.wl
 
 ResetDirectory[]

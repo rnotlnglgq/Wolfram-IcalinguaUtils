@@ -19,7 +19,7 @@ BeginPackage["IcalinguaUtils`"]
 ]
 
 
-`$MessageSearchApp := IcalinguaUtils`MessageSearch`GUI`SelectDatabase[]
+`MessageSearchApp[] := IcalinguaUtils`MessageSearch`GUI`SelectDatabase[]
 
 
 Begin["`Private`"]
@@ -118,40 +118,44 @@ IcalinguaUtils`MessageSearch`$FormObject := (
 			"Interpreter" -> "Number",
 			"Control" -> InputField,
 			"Label" -> "\:4f1a\:8bddID",
-			"Required"->False
+			"Required"->False,
+			"Hint" -> "Optional"
 		|>,
 		"senderId" -> <|
 			"Interpreter" -> Restricted["String", DigitCharacter.., {5, Infinity}],
 			"Control" -> InputField,
 			"Label" -> "\:53d1\:9001\:8005ID",
-			"Required"->False
+			"Required"->False,
+			"Hint" -> "Optional"
 		|>,
 		"contentKeyword" -> <|
 			"Interpreter" -> "String",
 			"Control" -> InputField,
 			"Label" -> "\:5185\:5bb9\:ff08\:5173\:952e\:8bcd\:ff09",
-			"Required"->False
+			"Required"->False,
+			"Hint" -> "Optional"
 		|>,
 		"contentPattern" -> <|
 			"Interpreter" -> "Expression",
 			"Control" -> InputField,
 			"Label" -> "\:5185\:5bb9\:ff08\:6a21\:5f0f\:ff09",
-			"Required"->False
+			"Required" -> False,
+			"Hint" -> "Optional"
 		|>,
 		"contentFilter" -> <|
 			"Interpreter" -> "Expression",
 			"Control" -> InputField,
 			"Label" -> "\:5185\:5bb9\:ff08\:7b5b\:9009\:5668\:ff09",
 			"Required" -> False,
-			"Hint" -> "Default: True"
+			"Hint" -> "Optional"
 		|>,
 		"dateLower" -> <|
 			"Interpreter" -> Function[
 				IcalinguaUtils`MessageSearch`FieldInterpreter["DateObject"]@IcalinguaUtils`MessageSearch`Private`$dateLower
 			],
 			"Control" -> Function@Row@{
-				InputField[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateLower, Expression],
-				Developer`DateSetter[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateLower]
+				Developer`DateSetter[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateLower, NotebookTools`DateSetterRange -> {1970,1,1}],
+				InputField[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateLower, Expression]
 			},
 			"Input" -> "This is a placeholder",
 			"Label" -> "\:8d77\:59cb\:65f6\:95f4",
@@ -163,8 +167,8 @@ IcalinguaUtils`MessageSearch`$FormObject := (
 				IcalinguaUtils`MessageSearch`FieldInterpreter["DateObject"]@IcalinguaUtils`MessageSearch`Private`$dateUpper
 			],
 			"Control" -> Function@Row@{
-				InputField[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateUpper, Expression],
-				Developer`DateSetter[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateUpper]
+				Developer`DateSetter[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateUpper, NotebookTools`DateSetterRange -> {1970,1,1}],
+				InputField[Dynamic@IcalinguaUtils`MessageSearch`Private`$dateUpper, Expression]
 			},
 			"Input" -> "This is a placeholder",
 			"Label" -> "\:7ec8\:6b62\:65f6\:95f4",
@@ -175,10 +179,11 @@ IcalinguaUtils`MessageSearch`$FormObject := (
 			"Interpreter" -> "Expression",
 			"Control" -> InputField,
 			"Label" -> "\:65f6\:95f4\:6233\:ff08\:8fc7\:6ee4\:5668\:ff09",
-			"Required" -> False
+			"Required" -> False,
+			"Hint" -> "Optional"
 		|>,
 		"queryField" -> <|
-			"Interpreter" -> AnySubset@{"time", "roomId", "senderId", "username", "content", "replyMessage"},
+			"Interpreter" -> AnySubset@{"_id", "time", "roomId", "senderId", "username", "content", "at", "replyMessage", "files"},
 			"Control" -> TogglerBar,
 			"Label" -> "\:8fd4\:56de\:5b57\:6bb5",
 			"Input" -> {"time", "roomId", "senderId", "username", "content", "replyMessage"}
@@ -187,7 +192,8 @@ IcalinguaUtils`MessageSearch`$FormObject := (
 			"Interpreter" -> "Number",
 			"Control" -> InputField,
 			"Label" -> "\:67e5\:8be2\:7528\:65f6\:9650\:5236",
-			"Default" -> 10
+			"Default" -> 10,
+			"Hint" -> "Default: 10"
 		|>
 	}
 )
@@ -286,7 +292,7 @@ IcalinguaUtils`MessageSearch`GUI`SelectDatabase[] := CreateWindow@With[{
 					DialogReturn@IcalinguaUtils`MessageSearch`GUI`QueryFormPage[]
 			)&/@paths
 			]
-		}],
+		}, WindowTitle -> "\:9009\:62e9\:6570\:636e\:5e93"],
 		DialogNotebook[{TextCell["Empty database folder!"], DefaultButton[]}]
 	]
 ]
@@ -305,10 +311,13 @@ IcalinguaUtils`MessageSearch`GUI`QueryFormPage[] := CreateDialog[
 		IcalinguaUtils`MessageSearch`$FormObject,
 		IcalinguaUtils`MessageSearch`QueryByFormAsync,
 		{"Form", "Button"}
+		, AppearanceRules -> <|"SubmitLabel" -> "\:67e5\:8be2"|>
 	]
 , Saveable -> False
-, WindowElements -> {"VerticalScrollBar", "HorizontalScrollBar", "MagnificationPopup"}
-, WindowSize -> All]
+, WindowElements -> {}
+, WindowSize -> All
+, WindowTitle -> "\:67e5\:8be2\:8868\:5355"
+]
 
 
 (* ::Subsubsection:: *)
@@ -318,11 +327,13 @@ IcalinguaUtils`MessageSearch`GUI`QueryFormPage[] := CreateDialog[
 (*IcalinguaUtils`MessageSearch`$AsyncQueryFinishHandler = MessageDialog*)
 
 
-IcalinguaUtils`MessageSearch`$AsyncQueryFinishHandler =
-	NotebookPut@*IcalinguaUtils`MessageSearch`GUI`LayoutResult@*IcalinguaUtils`MessageSearch`GUI`FormatResult
+IcalinguaUtils`MessageSearch`$AsyncQueryFinishHandler = Function[
+	IcalinguaUtils`MessageSearch`$LastQueryResult = #;
+	NotebookPut@IcalinguaUtils`MessageSearch`GUI`LayoutResult@IcalinguaUtils`MessageSearch`GUI`FormatResult@#
+];
 
 
-IcalinguaUtils`MessageSearch`$FieldFormatter = <|
+IcalinguaUtils`MessageSearch`$FieldFormatter = {
 	"time" -> Function@DateString[FromUnixTime[#/1000.], "ISODateTime"],
 	"roomId" -> Identity,
 	"senderId" -> Identity,
@@ -331,22 +342,29 @@ IcalinguaUtils`MessageSearch`$FieldFormatter = <|
 	"replyMessage" -> Function@If[MissingQ@#,
 		"",
 		#username<>":\n"<>#content&@ImportByteArray[StringToByteArray@#, "RawJSON"]
-	]
-|>;
+	],
+	"files" -> Function@Grid[
+		Values@*Query[{"type", "name", "url", "size"}] /@ ImportByteArray[StringToByteArray@#, "RawJSON"]
+	, Frame -> All],
+	"at" -> Replace[_Missing -> ""],
+	_ -> Identity
+};
 
 
 IcalinguaUtils`MessageSearch`GUI`FormatResult[taskAssoc_Association] := With[{
 	field = #EvaluationExpression[[1,1, "queryField"]]&@taskAssoc,
 	result = #EvaluationResult&@taskAssoc
 },
-	MapThread[Construct]@{field /. IcalinguaUtils`MessageSearch`$FieldFormatter, #}& /@ result
+	MapThread[Construct]@{Replace[field, IcalinguaUtils`MessageSearch`$FieldFormatter, {1}], #}& /@ result
 		//TableForm[#, TableHeadings -> {Range@Length@#, field}]&
 ]
 
 
 IcalinguaUtils`MessageSearch`GUI`LayoutResult[expr_] := Notebook[
 	{Cell@BoxData@ToBoxes@Style[expr, ShowStringCharacters -> False]}
-, StyleDefinitions -> "Default.nb"]
+, StyleDefinitions -> "Default.nb"
+, WindowTitle -> "\:67e5\:8be2\:7ed3\:679c"
+]
 
 
 (* ::Subsubsection:: *)

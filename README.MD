@@ -31,4 +31,5 @@ $MessageSearchApp
 ## TODO
 
 * Check identity of `EntityStore`s instead of reloading them everytime.
-* Adjust some notebook options.
+* Better notebook appearance.
+* On post processing, divide steps as interpretation-save-format.

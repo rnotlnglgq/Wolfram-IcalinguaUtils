@@ -207,8 +207,8 @@ IcalinguaUtils`MessageSearch`$FormObject := (
 
 
 IcalinguaUtils`MessageSearch`GenerateFormFilter[formAssoc_Association] := With[{
-	contentKeywordFilter = If[MissingQ@#, Nothing&, #]&@#contentKeyword,
-	contentPatternFilter = If[MissingQ@#, Nothing&, #]&@#contentPattern,
+	contentKeywordFilter = If[MissingQ@#, Nothing&, `Verbatim[StringContainsQ][#]]&@#contentKeyword,
+	contentPatternFilter = If[MissingQ@#, Nothing&, `Verbatim[StringMatchQ][#]]&@#contentPattern,
 	contentFilter = If[MissingQ@#, Nothing&, #]&@#contentFilter,
 	timeFilter = Which[
 		!MissingQ@#timestampFilter,
@@ -230,9 +230,9 @@ IcalinguaUtils`MessageSearch`GenerateFormFilter[formAssoc_Association] := With[{
 			Nothing&
 	]
 },
-	EntityFunction[IcalinguaUtils`MessageSearch`Private`$entity,
+	Function[Null, EntityFunction[IcalinguaUtils`MessageSearch`Private`$entity,
 		And@##
-	]&@@{
+	] /. `Verbatim@v_ :> v, HoldAll]@@{
 		contentKeywordFilter@IcalinguaUtils`MessageSearch`Private`$entity["content"],
 		contentPatternFilter@IcalinguaUtils`MessageSearch`Private`$entity["content"],
 		contentFilter@IcalinguaUtils`MessageSearch`Private`$entity["content"],
@@ -338,7 +338,7 @@ IcalinguaUtils`MessageSearch`$FieldFormatter = {
 	"roomId" -> Identity,
 	"senderId" -> Identity,
 	"username" -> Identity,
-	"content" -> Identity,
+	"content" -> Function@InsertLinebreaks[#, 36],
 	"replyMessage" -> Function@If[MissingQ@#,
 		"",
 		#username<>":\n"<>#content&@ImportByteArray[StringToByteArray@#, "RawJSON"]

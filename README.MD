@@ -25,11 +25,12 @@ PacletInstall["IcalinguaUtils", "Site" -> "https://github.com/rnotlnglgq/Wolfram
 Evaluate this:
 
 ```
-$MessageSearchApp
+MessageSearchApp[]
 ```
 
 ## TODO
 
-* Check identity of `EntityStore`s instead of reloading them everytime.
+* Check identity of `EntityStore`s instead of reloading them every time.
 * Better notebook appearance.
-* On post processing, divide steps as interpretation-save-format.
+* On post processing, divide steps as interpret->save->format.
+* Search room name by keyword.
